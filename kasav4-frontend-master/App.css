@@ -34,18 +34,6 @@
 
 .logo {
   height: 32px;
+  background: rgba(255, 255, 255, 0.2);
   margin: 16px;
-  text-align: center;
-}
-
-.form-row {
-  margin-top: 30px;
-  margin-bottom: 30px;
-  margin-left: 15px;
-
-}
-.form-dropdown {
-  width: 100%;
-
-
 }

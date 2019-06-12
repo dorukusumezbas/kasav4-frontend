@@ -6,7 +6,6 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import Dashboard from './components/Dashboard';
 import Entries from './components/Entries';
 import Form1 from "./components/Form1";
-import logo from './resources/logo.png'
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Title } = Typography;
@@ -24,11 +23,9 @@ function Cerceve(props) {
           onCollapse={(collapsed, type) => {
             console.log(collapsed, type);
           }}
-          style={{height: "100vh"}}
         >
-
-          <div className="logo" ><img src={logo} style={{height: 32 }}/></div>
-            <Menu theme="dark" mode="inline" defaultSelectedKeys={['4']}>
+          <div className="logo" />
+          <Menu theme="dark" mode="inline" defaultSelectedKeys={['4']}>
             <Menu.Item key="1">
               <Icon type="user" />
               <span className="nav-text">Anasayfa</span>
