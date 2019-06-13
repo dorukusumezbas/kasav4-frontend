@@ -1,6 +1,6 @@
 import React from 'react'
 import axios from 'axios'
-import moment from 'moment'
+import moment, {ISO_8601} from 'moment'
 import {
     Form,
     Input,
@@ -33,6 +33,8 @@ class Cikis extends React.Component {
         autoCompleteResult: [],
         one: [],
         residences: [],
+        paymentMethod: null,
+        banks: []
     };
 
     componentDidMount() {
@@ -42,18 +44,19 @@ class Cikis extends React.Component {
           })
     }
 
-    componentDidUpdate() {
-        axios.get(base_url + 'api/one/')
-          .then(response => {
-              this.setState({one: response.data.content})
-          })
-    }
-
     handleSubmit = e => {
         e.preventDefault();
         this.props.form.validateFieldsAndScroll((err, values) => {
             if (!err) {
-                console.log('Received values of form: ', values);
+                values['datetime'] = values["date-time-picker"].toISOString()
+                values['transaction_type'] = 2
+                values['two'] = values["residence"][0]
+                values['three'] = values["residence"][1]
+                values['four'] = values["residence"][2]
+                axios.post(base_url + '/api/transaction/',values)
+                  .then(response => {
+                      console.log(response)
+                  })
             }
         });
     };
@@ -65,11 +68,28 @@ class Cikis extends React.Component {
           })
     }
 
+    handlePaymentChange = value => {
+        if(value === "bank") {
+            axios.get(base_url + '/api/bank/')
+              .then(response => {
+                  this.setState({paymentMethod: "bank"})
+                  return response
+              })
+              .then(response => {
+                  this.setState({banks: response.data})
+
+              })
+        }
+        else {
+            this.setState({paymentMethod: value, banks: []})
+        }
+    }
+
 
 
     render() {
         const { getFieldDecorator } = this.props.form;
-        const { one, currencies } = this.state;
+        const { one, currencies, banks, paymentMethod } = this.state;
 
         const formItemLayout = {
             labelCol: {
@@ -88,14 +108,30 @@ class Cikis extends React.Component {
                     offset: 0,
                 },
                 sm: {
-                    span: 16,
+                    span: 8,
                     offset: 8,
                 },
             },
         };
+        const bankRadios = <Form.Item label="Banka Seçiniz:">
+            {getFieldDecorator('bank', {
+                rules: [
+                    {
+                        required: paymentMethod === "bank",
+                        message: 'Lütfen banka seçiniz',
+                    },
+                ],
+            })(<Radio.Group buttonStyle="solid">
+            {banks.map((item) => (
+              <Radio.Button value={item.id}>{item.title}</Radio.Button>
+            ))}
+        </Radio.Group>)}
+        </Form.Item>
 
         return (
-          <Form {...formItemLayout} onSubmit={this.handleSubmit}>
+          <Form {...formItemLayout} onSubmit={this.handleSubmit} style = {{marginLeft: "50px", marginRight: "50px"}}>
+              <Row gutter={8}>
+                  <Col span={24}>
               <Form.Item label="Ödeme Yöntemi">
                   {getFieldDecorator('transaction_method', {
                       rules: [
@@ -104,7 +140,7 @@ class Cikis extends React.Component {
                               message: 'Ödeme Yöntemi Seçiniz',
                           },
                       ],
-                  })(<Select>
+                  })(<Select onSelect = {this.handlePaymentChange}>
                       <Option value="cash">Nakit</Option>
                       <Option value="bank">Banka</Option>
                       <Option value="check">Çek</Option>
@@ -112,8 +148,10 @@ class Cikis extends React.Component {
                   </Select>)}
               </Form.Item>
 
+                      {paymentMethod==="bank" ? bankRadios : null}
+
               <Form.Item label="Masraf Merkezi">
-                  {getFieldDecorator('cost_center', {
+                  {getFieldDecorator('one', {
                       rules: [
                           {
                               required: true,
@@ -127,8 +165,6 @@ class Cikis extends React.Component {
                   </Select>)}
               </Form.Item>
               <Form.Item label="Kategori">
-                  <Row gutter={8}>
-                      <Col span={12}>
                       {getFieldDecorator('residence', {
                       initialValue: ['zhejiang', 'hangzhou', 'xihu'],
                       rules: [
@@ -136,26 +172,21 @@ class Cikis extends React.Component {
                       ],
                   })(<Cascader options={this.state.residences} placeholder="Please select"
                                showSearch={{ filter }} />)}
-                      </Col>
-                  </Row>
+
               </Form.Item>
               <Form.Item label="Açıklama">
-                  <Row gutter={8}>
-                      <Col span={12}>
+
                           {getFieldDecorator('description', {
                               rules: [{ required: true, message: 'Lütfen açıklama giriniz.' }],
                           })(<Input />)}
-                      </Col>
-                  </Row>
+
               </Form.Item>
               <Form.Item label="Tutar">
-                  <Row gutter={8}>
-                      <Col span={12} >
+
                           {getFieldDecorator('amount', {
                               rules: [{ required: true, message: 'Lütfen miktar giriniz.' }],
                           })(<InputNumber min={1} style={{width: "100%"}}/>)}
-                      </Col>
-                  </Row>
+
               </Form.Item>
               <Form.Item  label="Tarih">
                   {getFieldDecorator('date-time-picker', {
@@ -167,8 +198,7 @@ class Cikis extends React.Component {
                   )}
               </Form.Item>
               <Form.Item label="Para Birimi">
-                  <Row gutter={8}>
-                      <Col span={12} >
+
                           {getFieldDecorator('currency', {
                               rules: [{ required: true, message: 'Lütfen miktar giriniz.' }],
                               initialValue: 1
@@ -178,16 +208,15 @@ class Cikis extends React.Component {
                                 <Radio value = {3}>€</Radio>
                             </Radio.Group>
                           )}
-                      </Col>
-                  </Row>
+
               </Form.Item>
-
-
-              <Form.Item {...tailFormItemLayout}>
+              <Form.Item {...tailFormItemLayout} style={{textAlign: "center"}}>
                   <Button type="primary"  htmlType="submit">
                       Kaydet
                   </Button>
               </Form.Item>
+                  </Col>
+              </Row>
 
 
           </Form>

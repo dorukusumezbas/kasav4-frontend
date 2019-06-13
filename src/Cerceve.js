@@ -24,11 +24,11 @@ function Cerceve() {
           onCollapse={(collapsed, type) => {
             console.log(collapsed, type);
           }}
-          style={{height: "100vh", backgroundColor: "#d9d9d9" }}
+          style={{height: "100vh" }}
         >
 
           <div className="logo" ><img src={logo} style={{height: 32 }}/></div>
-            <Menu style={{backgroundColor: "#d9d9d9" }} mode="inline" defaultSelectedKeys={['4']}>
+            <Menu theme = "dark" mode="inline" defaultSelectedKeys={['4']}>
             <Menu.Item key="1">
               <Icon type="user" />
               <span className="nav-text">Anasayfa</span>
@@ -47,7 +47,6 @@ function Cerceve() {
               <span>Yeni İşlem</span>
             </span>
               }
-              style={{backgroundColor: "#d9d9d9"}}
             >
               <Menu.Item key="3">Giriş<Link to="/Giris" /></Menu.Item>
               <Menu.Item key="4">Çıkış<Link to="/Cikis" /></Menu.Item>
@@ -59,8 +58,8 @@ function Cerceve() {
           <Header style={{ background: '#fff', padding: 0, textAlign: "center", paddingTop: "10px"}}>
                 <Title level={2}> Kasa v4</Title>
           </Header>
-          <Content style={{ margin: '0px 0px 20px' }}>
-            <div style={{ background: "#fff", minHeight: 360 }}>
+          <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
+            <div style={{ background: "#fff", minHeight: 360, paddingTop: "32px" }}>
               <Route exact path="/" component={Dashboard} />
               <Route path="/Entries" component={Entries} />
               <Route path="/Cikis" component={Cikis} />
