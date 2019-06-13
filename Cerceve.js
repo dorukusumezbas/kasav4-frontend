@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import Dashboard from './components/Dashboard'
 import Entries from './components/Entries'
 import Form1 from './components/Form1'
+import Cikis from "./src/components/Cikis";
 
 const { Header, Content, Footer, Sider } = Layout
 const { Title } = Typography
@@ -53,8 +54,9 @@ function Cerceve(props) {
           </Header>
           <Content style={{ margin: '24px 16px 0' }}>
             <div style={{ padding: 24, background: "#fff", minHeight: 360 }}>
-              <Route exact path="/Form1" component={CustomizedForm} />
-              <Route path="/Entries" component={Entries} />
+              <Route exact path="/" component={Dashboard} />
+              <Route exact path="/New" component={Form1} />
+              <Route path="/Entries" component={Cikis} />
             </div>
           </Content>
           <Footer style={{textAlign: 'center'}}>Touché Privé
