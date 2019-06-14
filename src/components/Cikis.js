@@ -1,28 +1,23 @@
 import React from 'react'
 import axios from 'axios'
-import moment, {ISO_8601} from 'moment'
+import moment from 'moment'
 import {
     Form,
     Input,
-    Tooltip,
-    Icon,
     Cascader,
     Select,
     Row,
     Col,
-    Checkbox,
     Button,
-    AutoComplete,
     InputNumber,
     Radio,
-    DatePicker,
-} from 'antd';
+    DatePicker, message,
+} from 'antd'
 
-
-const { Option, } = Select;
+const { Option } = Select
 
 const filter = (inputValue, path) => {
-    return path.some(option => option.label.toLowerCase().indexOf(inputValue.toLowerCase()) > -1);
+    return path.some(option => option.label.toLowerCase().indexOf(inputValue.toLowerCase()) > -1)
 }
 
 const base_url = 'http://127.0.0.1:8000'
@@ -35,7 +30,7 @@ class Cikis extends React.Component {
         residences: [],
         paymentMethod: null,
         banks: []
-    };
+    }
 
     componentDidMount() {
         axios.post(base_url + '/api/one/',{"transaction_type" : 2})
@@ -56,10 +51,15 @@ class Cikis extends React.Component {
                 axios.post(base_url + '/api/transaction/',values)
                   .then(response => {
                       console.log(response)
+                      message.success('İşlem başarıyla oluşturuldu.')
+                      this.props.form.resetFields()
+                  })
+                  .catch(error => {
+                      message.error('İşlem tamamlanamadı: ' + error.toString())
                   })
             }
-        });
-    };
+        })
+    }
 
     handleChange = value => {
         axios.post(base_url + '/api/categories/', {"id": value})
@@ -76,7 +76,7 @@ class Cikis extends React.Component {
                   return response
               })
               .then(response => {
-                  this.setState({banks: response.data})
+                  this.setState({banks: response.data.filter(el=> el.isBank)})
 
               })
         }
@@ -85,11 +85,9 @@ class Cikis extends React.Component {
         }
     }
 
-
-
     render() {
         const { getFieldDecorator } = this.props.form;
-        const { one, currencies, banks, paymentMethod } = this.state;
+        const { one, banks, paymentMethod } = this.state;
 
         const formItemLayout = {
             labelCol: {
@@ -220,8 +218,8 @@ class Cikis extends React.Component {
 
 
           </Form>
-        );
+        )
     }
 }
 
-export default Form.create({ name: 'register' })(Cikis);
+export default Form.create({ name: 'cikis' })(Cikis);

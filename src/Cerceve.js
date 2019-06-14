@@ -4,8 +4,9 @@ import 'antd/dist/antd.css';
 import { Layout, Menu, Icon, Typography, Row, Col } from 'antd';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import Dashboard from './components/Dashboard';
-import Entries from './components/Entries';
+import Entries from './components/Giris';
 import Cikis from "./components/Cikis";
+import Giris from "./components/Giris";
 import logo from './resources/logo.png'
 
 const { Header, Content, Footer, Sider } = Layout
@@ -61,7 +62,7 @@ function Cerceve() {
           <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
             <div style={{ background: "#fff", minHeight: 360, paddingTop: "32px" }}>
               <Route exact path="/" component={Dashboard} />
-              <Route path="/Entries" component={Entries} />
+              <Route path="/Giris" component={Giris} />
               <Route path="/Cikis" component={Cikis} />
             </div>
           </Content>
