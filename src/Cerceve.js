@@ -7,6 +7,8 @@ import Dashboard from './components/Dashboard';
 import Entries from './components/Giris';
 import Cikis from "./components/Cikis";
 import Giris from "./components/Giris";
+import Virman from "./components/Virman";
+import Tablo from "./components/Tablo";
 import logo from './resources/logo.png'
 
 const { Header, Content, Footer, Sider } = Layout
@@ -38,7 +40,7 @@ function Cerceve() {
             <Menu.Item key="2">
               <Icon type="video-camera" />
               <span className="nav-text">Tablo</span>
-              <Link to="/Entries" />
+              <Link to="/Tablo" />
             </Menu.Item>
             <SubMenu
               key="sub2"
@@ -64,6 +66,8 @@ function Cerceve() {
               <Route exact path="/" component={Dashboard} />
               <Route path="/Giris" component={Giris} />
               <Route path="/Cikis" component={Cikis} />
+              <Route path="/Virman" component={Virman} />
+              <Route path="/Tablo" component = {Tablo} />
             </div>
           </Content>
           <Footer style={{textAlign: 'center'}}>Touché Privé

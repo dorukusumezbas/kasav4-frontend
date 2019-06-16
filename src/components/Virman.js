@@ -23,20 +23,18 @@ const filter = (inputValue, path) => {
 
 const base_url = 'http://127.0.0.1:8000'
 
-class Giris extends React.Component {
+class Virman extends React.Component {
   state = {
-    confirmDirty: false,
-    autoCompleteResult: [],
-    one: [],
-    residences: [],
-    paymentMethod: null,
-    banks: []
+    banks_from: [],
+    banks_to: [],
+    description: "",
   }
 
   componentDidMount() {
-    axios.post(base_url + '/api/one/',{"transaction_type" : 1})
+    axios.get(base_url + '/api/bank/')
       .then(response => {
-        this.setState({one: response.data.content})
+        console.log(response.data)
+        this.setState({banks_from: response.data})
       })
   }
 
@@ -44,11 +42,9 @@ class Giris extends React.Component {
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
+        console.log(values)
         values['datetime'] = values["date-time-picker"].toISOString()
-        values['transaction_type'] = 1
-        values['two'] = values["residence"][0]
-        values['three'] = values["residence"][1]
-        values['four'] = values["residence"][2]
+        values['transaction_type'] = 3
         axios.post(base_url + '/api/transaction/',values)
           .then(response => {
             console.log(response)
@@ -62,33 +58,39 @@ class Giris extends React.Component {
     })
   }
 
-  handleChange = value => {
-    axios.post(base_url + '/api/categories/', {"id": value})
-      .then(response => {
-        this.setState({residences: response.data.content})
-      })
+  bankFromChange = event => {
+    const selected_object = this.state.banks_from.filter(item => {
+      return item.id === event.target.value
+    })
+    console.log(selected_object)
+    const array_of_banks = selected_object[0].bank
+    const filtered_banks_to = this.state.banks_from.filter(item => {
+      return array_of_banks.includes(item.id)
+    })
+    this.setState({banks_to: filtered_banks_to})
+
   }
 
-  handlePaymentChange = value => {
-    if(value === "bank") {
-      axios.get(base_url + '/api/bank/')
-        .then(response => {
-          this.setState({paymentMethod: "bank"})
-          return response
-        })
-        .then(response => {
-          this.setState({banks: response.data.filter(el=> el.isBank)})
+  bankToChange = event => {
+    const bank_from_value = this.props.form.getFieldValue('bank_from')
+    console.log(bank_from_value)
+    const bank_from_object = this.state.banks_from.filter(item => {
+      return item.id === bank_from_value
+    })
 
-        })
-    }
-    else {
-      this.setState({paymentMethod: value, banks: []})
-    }
+    const bank_to_object = this.state.banks_from.filter(item => {
+      return item.id === event.target.value
+    })
+    const bank_from = bank_from_object[0].title
+    console.log(bank_from)
+    const bank_to = bank_to_object[0].title
+    console.log(bank_to)
+    this.props.form.setFieldsValue({description: bank_from + " kaynağından " + bank_to + " hedefine virman"})
   }
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { one, banks, paymentMethod } = this.state;
+    const { banks_from, banks_to } = this.state;
 
     const formItemLayout = {
       labelCol: {
@@ -112,79 +114,53 @@ class Giris extends React.Component {
         },
       },
     };
-    const bankRadios = <Form.Item label="Banka Seçiniz:">
-      {getFieldDecorator('bank', {
-        rules: [
-          {
-            required: paymentMethod === "bank",
-            message: 'Lütfen banka seçiniz',
-          },
-        ],
-      })(<Radio.Group buttonStyle="solid">
-        {banks.map((item) => (
-          <Radio.Button value={item.id}>{item.title}</Radio.Button>
-        ))}
-      </Radio.Group>)}
-    </Form.Item>
+
 
     return (
       <Form {...formItemLayout} onSubmit={this.handleSubmit} style = {{marginLeft: "50px", marginRight: "50px"}}>
         <Row gutter={8}>
           <Col span={24}>
-            <Form.Item label="Ödeme Kanalı">
-              {getFieldDecorator('transaction_method', {
+            <Form.Item label="Nereden:">
+              {getFieldDecorator('bank_from', {
                 rules: [
                   {
                     required: true,
-                    message: 'Ödeme Kanalı Seçiniz',
-                  }
-                ]
-              })(<Select onSelect = {this.handlePaymentChange}>
-                <Option value="cash">Nakit</Option>
-                <Option value="bank">Banka</Option>
-                <Option value="check">Çek</Option>
-                <Option value="credit_card">Kredi Kartı</Option>
-              </Select>)}
-            </Form.Item>
-
-            {paymentMethod==="bank" ? bankRadios : null}
-
-            <Form.Item label="Ciro Merkezi">
-              {getFieldDecorator('one', {
-                rules: [
-                  {
-                    required: true,
-                    message: 'Lütfen masraf merkezi seçiniz.',
+                    message: 'Lütfen para çıkışı olan kasayı seçiniz',
                   },
                 ],
-              })(<Select onSelect={this.handleChange}>
-                {one.map((item) => (
-                  <Option value = {item.id}>{item.title}</Option>
+              })(<Radio.Group buttonStyle="solid" onChange={this.bankFromChange}>
+                {banks_from.map((item) => (
+                  <Radio.Button value={item.id}>{item.title}</Radio.Button>
                 ))}
-              </Select>)}
+              </Radio.Group>)}
             </Form.Item>
-            <Form.Item label="Kategori">
-              {getFieldDecorator('residence', {
-                initialValue: ['zhejiang', 'hangzhou', 'xihu'],
+            <Form.Item label="Nereye:">
+              {getFieldDecorator('bank_to', {
                 rules: [
-                  { type: 'array', required: true, message: 'Lütfen kategorileri seçin.' },
+                  {
+                    required: true,
+                    message: 'Lütfen alıcı kasa seçiniz',
+                  },
                 ],
-              })(<Cascader options={this.state.residences} placeholder="Please select"
-                           showSearch={{ filter }} />)}
-
+              })(<Radio.Group buttonStyle="solid" onChange={this.bankToChange}>
+                {banks_to.map((item) => (
+                  <Radio.Button value={item.id}>{item.title}</Radio.Button>
+                ))}
+              </Radio.Group>)}
             </Form.Item>
+
             <Form.Item label="Açıklama">
 
               {getFieldDecorator('description', {
-                rules: [{ required: true, message: 'Lütfen açıklama giriniz.' }],
-              })(<Input />)}
+                rules: [{ required: true, message: 'Lütfen açıklama giriniz.' }]
+              })(<Input/>)}
 
             </Form.Item>
-            <Form.Item label="Tutar" >
+            <Form.Item label="Tutar">
 
               {getFieldDecorator('amount', {
                 rules: [{ required: true, message: 'Lütfen miktar giriniz.' }],
-              })(<InputNumber min={1} style={{width:"50%"}}/>)}
+              })(<InputNumber min={1} style={{width: "50%"}}/>)}
 
             </Form.Item>
             <Form.Item  label="Tarih">
@@ -223,4 +199,4 @@ class Giris extends React.Component {
   }
 }
 
-export default Form.create({ name: 'giris' })(Giris);
+export default Form.create({ name: 'virman' })(Virman);

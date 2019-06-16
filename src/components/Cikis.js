@@ -183,7 +183,7 @@ class Cikis extends React.Component {
 
                           {getFieldDecorator('amount', {
                               rules: [{ required: true, message: 'Lütfen miktar giriniz.' }],
-                          })(<InputNumber min={1} style={{width: "100%"}}/>)}
+                          })(<InputNumber min={1} style={{width:"50%"}}/>)}
 
               </Form.Item>
               <Form.Item  label="Tarih">
